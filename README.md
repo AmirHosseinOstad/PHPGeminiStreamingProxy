@@ -1,57 +1,82 @@
-**🤖 PHP Gemini Streaming Proxy**
-A lightweight, optimized, and powerful PHP script for communicating with Google Gemini AI models in real-time streaming. This script is specifically designed for use as a backend in bots, chatbots, and web applications.
+# 🤖 PHP Gemini Streaming Proxy
 
-✨ Highlights
-🔄 Round-Robin: Ability to use multiple API keys in a round robin fashion with secure file management to prevent concurrent requests from interfering.
-⚡ Real-time Streaming: Disable output buffering to display AI responses in real time (suitable for chat UIs).
-🧠 Smart Model Selection: Automatically selects the right model based on user needs (regular chat, deep thinking, web search, or image processing).
-🖼️ Image Support: Ability to send and analyze images along with text.
-🏷️ Chat Title Generation: Lightweight mode support for quickly generating titles for conversations.
-🛡️ Advanced error handling: Detect connection errors, HTTP errors, and Google safety filters.
+A lightweight, optimized, and powerful PHP script for communicating with Google Gemini AI models via real-time SSE streaming. Specifically designed for backends in telegram bots, web apps, and modern chat interfaces.
 
-⚙️ Prerequisites
-PHP version 8.0 or higher
-CURL library enabled in PHP
-Internet access and at least one API key from Google AI Studio
+---
 
-📥 Installation and setup
-1. Place the script file (for example, proxy.php) on your server or host.
-2. Enter your API keys in the $apiKeys array at the beginning of the code:
+## ✨ Features
 
-```
+* **🔄 Key Rotation (Round-Robin):** Rotates through multiple API keys with secure file locking (`LOCK_EX`) to handle concurrent requests smoothly.
+* **⚡ Real-time SSE Streaming:** Flushes buffers instantly to push responses line-by-line to your frontend.
+* **🧠 Dynamic Model Routing:** Auto-selects optimal models based on payload requirements (standard chat, deep reasoning, web grounding, or vision).
+* **🖼️ Multimodal Support:** Accepts base64 encoded images for direct visual analysis alongside prompt instructions.
+* **🏷️ Utility Mode:** Lightweight mode optimized for low-latency chat title generation.
+* **🛡️ Robust Error Handling:** Filters and reports connection failures, HTTP errors, and safety threshold triggers gracefully.
+
+---
+
+## ⚙️ Requirements
+
+* **PHP:** 8.0 or higher
+* **Extensions:** `curl`, `json`
+* **Permissions:** Write access in the script directory (for tracking key index states)
+* **API Key:** Active key from Google AI Studio
+
+---
+
+## 📥 Quick Setup
+
+1. Copy `proxy.php` to your application directory.
+2. Configure your API keys array at the top of the script:
+
+```php
 $apiKeys = [
-'AIzaSyYourApiKeyHere1...',
-'AIzaSyYourApiKeyHere2...',
-// Add as many keys as you want
+    'AIzaSyYourApiKeyHere1...',
+    'AIzaSyYourApiKeyHere2...',
 ];
+
 ```
 
-3. Make sure you have Write Permission to create the api_key_index.txt file next to the script folder.
+3. Ensure directory permissions allow file creation for state persistence (`api_key_index.txt`).
 
-🚀 How to use (send a request)
-This script receives requests as POST and in JSON format.
-Sample request structure (JSON):
-```
+---
+
+## 🚀 API Specification
+
+Send POST requests with a JSON payload to the proxy endpoint.
+
+### Request Payload Format
+
+```json
 {
-"messages": [
-{ "role": "user", "text": "Hi, how can I learn Python?" }
-],
-"think": false,
-"search": true,
-"hasImage": false
+  "messages": [
+    { "role": "user", "text": "Hi, how can I learn Python?" }
+  ],
+  "think": false,
+  "search": true,
+  "hasImage": false
 }
+
 ```
 
-Parameters passed:
-messages: An array of previous chat messages (user or model).
-text: (optional) Plain text to send individually (if not using the messages structure).
-think: (boolean) Enable deep thinking mode for the model (if needed).
-search: (boolean) Enable web search capability in Google.
-hasImage: (boolean) Setting for image processing.
-image: (array - if hasImage: true) containing mimeType and data (in Base64).
-forTitle: (boolean) Use the lightest model to generate the chat title.
+### Parameters Reference
 
-📄 License
-This project is released under the MIT License. You can use it freely in your personal and commercial projects.
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| `messages` | `array` | Optional* | Sequential list of historical chat messages (`role`, `text`). |
+| `text` | `string` | Optional* | Direct text prompt if not sending full conversation history. |
+| `think` | `boolean` | Optional | Enables deep thinking/reasoning mode. |
+| `search` | `boolean` | Optional | Enables Google Web Search grounding. |
+| `hasImage` | `boolean` | Optional | Set to `true` when including image data. |
+| `image` | `object` | Optional | Contains `mimeType` and `data` (Base64 string). |
+| `forTitle` | `boolean` | Optional | Routes to a fast, low-cost model for title generation. |
 
-Developed with ❤️ for use in your cool projects. If you have any suggestions, contributions in the form of a Pull Request are always welcome!
+---
+
+## 📄 License
+
+Distributed under the MIT License. Free for personal and commercial usage.
+
+---
+
+Crafted with ❤️ for modern developer tools. Contributions and Pull Requests are welcome!
